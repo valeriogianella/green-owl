@@ -1,0 +1,50 @@
+{
+    "reinsurance_contracts": [
+      {
+        "contract_id": "RC001",
+        "name": "Reinsurance Contract 1",
+        "line_of_business": "Property",
+        "country": "USA",
+        "currency": "USD",  
+        "expected_loss": 5000000,
+        "standard_deviation": 1500000
+      },
+      {
+        "contract_id": "RC002",
+        "name": "Reinsurance Contract 2",
+        "line_of_business": "Motor",
+        "country": "Germany",
+        "currency": "USD",  
+        "expected_loss": 3000000,
+        "standard_deviation": 500000
+      },
+      {
+        "contract_id": "RC003",
+        "name": "Reinsurance Contract 3",
+        "line_of_business": "Liability",
+        "country": "Japan",
+        "currency": "USD",  
+        "expected_loss": 7000000,
+        "standard_deviation": 2000000
+      },
+      {
+        "contract_id": "RC004",
+        "name": "Reinsurance Contract 4",
+        "line_of_business": "Health",
+        "country": "France",
+        "currency": "USD",  
+        "expected_loss": 4000000,
+        "standard_deviation": 1000000
+      },
+      {
+        "contract_id": "RC005",
+        "name": "Reinsurance Contract 5",
+        "line_of_business": "Marine",
+        "country": "UK",
+        "currency": "USD",  
+        "expected_loss": 6000000,
+        "standard_deviation": 1800000
+      }
+    ]
+}
+
