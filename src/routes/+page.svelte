@@ -11,25 +11,47 @@
 		'Standard Deviation'
 	];
 	import contracts_json from './contracts.json';
-	let contracts = contracts_json.reinsurance_contracts;
+	let fileHandle = null;
+	let contracts = [];
 	let errorMessages = [];
+	let fileName = '';
 
-	async function handleFileUpload(event) {
-		console.log('File upload started');
-		const file = event.target.files[0];
-		if (!file) {
-			console.error('No file selected');
-			errorMessages = ['No file selected'];
+	async function handleFileOpen() {
+		try {
+			[fileHandle] = await window.showOpenFilePicker({
+				types: [
+					{
+						description: 'Excel Files',
+						accept: {
+							'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+							'application/vnd.ms-excel': ['.xls']
+						}
+					}
+				]
+			});
+			fileName = fileHandle.name;
+			await readFile();
+		} catch (error) {
+			console.error('Error in handleFileOpen:', error);
+			errorMessages = [...errorMessages, `Error reading file: ${error.message}`];
+		}
+	}
+
+	async function readFile() {
+		if (!fileHandle) {
+			console.error('No file handle available');
+			errorMessages = ['No file selected. Please upload a file first.'];
 			return;
 		}
-		console.log('File selected:', file.name);
 
+		const file = await fileHandle.getFile();
 		const workbook = new Workbook();
 		errorMessages = []; // Reset error messages
 
 		try {
 			console.log('Loading file...');
-			await workbook.xlsx.load(file);
+			const arrayBuffer = await file.arrayBuffer();
+			await workbook.xlsx.load(arrayBuffer);
 			console.log('File loaded successfully');
 
 			const worksheet = workbook.worksheets[0];
@@ -38,7 +60,6 @@
 			}
 
 			let headerValid = true;
-
 			console.log('Checking headers...');
 			headers.forEach((expectedHeader, index) => {
 				const cell = worksheet.getRow(1).getCell(index + 1);
@@ -77,16 +98,18 @@
 			contracts = jsonData;
 			console.log('Contracts updated');
 		} catch (error) {
-			console.error('Error in handleFileUpload:', error);
-			errorMessages = [
-				...errorMessages,
-				`Error reading file: ${error.message}`
-			];
+			console.error('Error in readFile:', error);
+			errorMessages = [...errorMessages, `Error reading file: ${error.message}`];
 		}
 	}
 
-	$: console.log('Contracts updated:', contracts);
-	$: console.log('Error messages:', errorMessages);
+	async function refreshData() {
+		if (fileHandle) {
+			await readFile();
+		} else {
+			errorMessages = ['No file selected. Please upload a file first.'];
+		}
+	}
 </script>
 
 <head>
@@ -95,8 +118,15 @@
 
 <h1>Welcome to Green Owl</h1>
 <p>Risk assessment for reinsurance portfolios</p>
+<div style="display: flex; gap: 10px;">
+	<button on:click={handleFileOpen}>Open File</button>
 
-<input type="file" accept=".xlsx, .xls" on:change={handleFileUpload} />
+	{#if fileName}
+		<p>Current file: {fileName}</p>
+		<button on:click={refreshData}>Refresh Data</button>
+	{/if}
+</div>
+
 {#if errorMessages.length > 0}
 	<div class="error">
 		{#each errorMessages as error}
@@ -104,6 +134,7 @@
 		{/each}
 	</div>
 {/if}
+
 <div>
 	<table>
 		<thead>
